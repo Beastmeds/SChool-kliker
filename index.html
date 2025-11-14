@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultimate School Clicker</title>
+  <style>
+    :root {
+      --bg-main: linear-gradient(135deg, #6e00ff, #00c3ff);
+      --text-col: white;
+      --btn-col: #ffcc00;
+      --btn-col-hover: #ffe066;
+    }
+
+    body.dark {
+      --bg-main: linear-gradient(135deg, #000000, #333333);
+      --text-col: #ffffff;
+      --btn-col: #444444;
+      --btn-col-hover: #666666;
+    }
+
+    body.light {
+      --bg-main: linear-gradient(135deg, #ffffff, #d9d9d9);
+      --text-col: #000000;
+      --btn-col: #bbbbbb;
+      --btn-col-hover: #dddddd;
+    }
+
+    body.school {
+      --bg-main: linear-gradient(135deg, #ff5500, #ffdd00);
+      --text-col: #000000;
+      --btn-col: #00aaff;
+      --btn-col-hover: #33ccff;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: var(--text-col);
+      overflow: hidden;
+      transition: 0.4s;
+    }
+
+    h1 { font-size: 40px; text-shadow: 0 0 10px rgba(0,0,0,0.4); }
+    #counter, #highscore, #powerupTimer { font-size: 28px; margin: 10px; }
+
+    #clickBtn {
+      padding: 20px 40px;
+      font-size: 28px;
+      border: none;
+      border-radius: 15px;
+      background: var(--btn-col);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    #clickBtn:hover { scale: 1.1; background: var(--btn-col-hover); }
+
+    .popup {
+      position: absolute;
+      font-size: 24px;
+      animation: float 1s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes float { 0% {opacity:1; transform:translateY(0);} 100% {opacity:0; transform:translateY(-80px);} }
+
+    #themeSelector {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      color: white;
+    }
+
+  </style>
+</head>
+<body>
+  <select id="themeSelector">
+    <option value="default">✨ Standard</option>
+    <option value="dark">🌙 Dunkel</option>
+    <option value="light">🔆 Hell</option>
+    <option value="school">🏫 Schul‑Meme‑Style</option>
+  </select>
+
+  <h1>Ultimate School Clicker</h1>
+  <div id="counter">Klicks: 0</div>
+  <div id="highscore">🏆 Highscore: 0</div>
+  <div id="powerupTimer"></div>
+  <button id="clickBtn">KLICK MICH!</button>
+
+  <audio id="clickSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_6ebadc177e.mp3?filename=click-124467.mp3"></audio>
+  <audio id="powerSound" src="https://cdn.pixabay.com/download/audio/2022/03/22/audio_6c7dbfad77.mp3?filename=powerup-110248.mp3"></audio>
+
+  <script>
+    let count = 0;
+    let highscore = localStorage.getItem("hs") || 0;
+    document.getElementById("highscore").textContent = "🏆 Highscore: " + highscore;
+
+    let multiplier = 1;
+    let powerTimer = 0;
+
+    const counter = document.getElementById("counter");
+    const highCounter = document.getElementById("highscore");
+    const timerText = document.getElementById("powerupTimer");
+    const btn = document.getElementById("clickBtn");
+
+    const clickSound = document.getElementById("clickSound");
+    const powerSound = document.getElementById("powerSound");
+
+    btn.addEventListener("click", (event) => {
+      clickSound.currentTime = 0;
+      clickSound.play();
+
+      count += multiplier;
+      counter.textContent = "Klicks: " + count;
+
+      if (count > highscore) {
+        highscore = count;
+        localStorage.setItem("hs", highscore);
+        highCounter.textContent = "🏆 Highscore: " + highscore;
+      }
+
+      const pop = document.createElement("div");
+      pop.classList.add("popup");
+      pop.textContent = "+" + multiplier;
+      pop.style.left = event.clientX + "px";
+      pop.style.top = event.clientY + "px";
+      document.body.appendChild(pop);
+      setTimeout(() => pop.remove(), 900);
+
+      if (Math.random() < 0.15) activatePowerup();
+    });
+
+    function activatePowerup() {
+      multiplier = 5;
+      powerTimer = 5;
+      powerSound.play();
+
+      timerText.textContent = "⚡ POWER-UP: " + powerTimer + "s";
+
+      const interval = setInterval(() => {
+        powerTimer--;
+        timerText.textContent = "⚡ POWER-UP: " + powerTimer + "s";
+
+        if (powerTimer <= 0) {
+          clearInterval(interval);
+          multiplier = 1;
+          timerText.textContent = "";
+        }
+      }, 1000);
+    }
+
+    const themeSelector = document.getElementById("themeSelector");
+    themeSelector.addEventListener("change", () => {
+      document.body.className = themeSelector.value;
+    });
+  </script>
+  <script>
+    // (Der gesamte alte JS-Code bleibt erhalten!)
+    // --- Erweiterungen kommen hier UNTEN hinzu ---
+
+    // 🎵 Hintergrundmusik
+    const music = new Audio("https://cdn.pixabay.com/download/audio/2023/03/13/audio_54d393ca5f.mp3?filename=gaming-music-143081.mp3");
+    music.loop = true;
+    music.volume = 0.3;
+    music.play();
+
+    // 🖼️ Meme-Hintergrund
+    const memeBackgrounds = [
+      "https://i.imgur.com/4AiXzf8.jpeg",
+      "https://i.imgur.com/b6QKOD4.jpeg",
+      "https://i.imgur.com/2yaf2wb.jpeg"
+    ];
+
+    let memeIndex = 0;
+    function changeMemeBg() {
+      document.body.style.backgroundImage = `url(${memeBackgrounds[memeIndex]})`;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center";
+      memeIndex = (memeIndex + 1) % memeBackgrounds.length;
+    }
+    setInterval(changeMemeBg, 15000);
+
+    // 🎓 Skins
+    const skins = {
+      schueler: "🧑‍🎓",
+      lehrer: "👨‍🏫",
+      direktor: "👨‍💼"
+    };
+
+    const skinBtn = document.createElement("button");
+    skinBtn.textContent = "🎭 Skin wechseln";
+    skinBtn.style.marginTop = "20px";
+    document.body.appendChild(skinBtn);
+
+    let currentSkin = localStorage.getItem("skin") || "schueler";
+    document.title = `Ultimate School Clicker ${skins[currentSkin]}`;
+
+    skinBtn.onclick = () => {
+      const keys = Object.keys(skins);
+      const next = keys[(keys.indexOf(currentSkin) + 1) % keys.length];
+      currentSkin = next;
+      localStorage.setItem("skin", currentSkin);
+      document.title = `Ultimate School Clicker ${skins[currentSkin]}`;
+    };
+
+    // 🎯 Levelsystem
+    let level = Number(localStorage.getItem("level") || 1);
+    let xp = Number(localStorage.getItem("xp") || 0);
+
+    const levelBox = document.createElement("div");
+    levelBox.style.fontSize = "24px";
+    levelBox.style.marginTop = "10px";
+    levelBox.textContent = `Level ${level} – XP: ${xp}`;
+    document.body.insertBefore(levelBox, btn);
+
+    function addXP(amount) {
+      xp += amount;
+      if (xp >= level * 50) {
+        xp = 0;
+        level++;
+        alert(`🎉 Level UP! Du bist jetzt Level ${level}!`);
+      }
+      localStorage.setItem("level", level);
+      localStorage.setItem("xp", xp);
+      levelBox.textContent = `Level ${level} – XP: ${xp}`;
+    }
+
+    btn.addEventListener("click", () => addXP(multiplier));
+
+    // 👑 Admin-Button
+    const adminBtn = document.createElement("button");
+    adminBtn.textContent = "👑 Admin Mode";
+    adminBtn.style.marginTop = "10px";
+    adminBtn.style.padding = "15px";
+    adminBtn.style.background = "red";
+    adminBtn.style.color = "white";
+    adminBtn.style.borderRadius = "10px";
+    document.body.appendChild(adminBtn);
+
+    let admin = localStorage.getItem("admin") === "true";
+
+    adminBtn.onclick = () => {
+      const pw = prompt("Admin Passwort eingeben (Standard: 1234)");
+      if (pw === "1234") {
+        admin = true;
+        localStorage.setItem("admin", true);
+        alert("Admin Mode aktiviert!");
+        unlockAdminTools();
+      }
+    };
+
+    function unlockAdminTools() {
+      if (!admin) return;
+      const cheatBtn = document.createElement("button");
+      cheatBtn.textContent = "💰 +1000 Punkte";
+      cheatBtn.style.marginTop = "10px";
+      cheatBtn.style.padding = "15px";
+      cheatBtn.style.background = "gold";
+      cheatBtn.style.color = "black";
+      cheatBtn.style.borderRadius = "10px";
+      document.body.appendChild(cheatBtn);
+
+      cheatBtn.onclick = () => {
+        count += 1000;
+        counter.textContent = "Klicks: " + count;
+      };
+    }
+
+    if (admin) unlockAdminTools();
+  </script>
+</body>
+</html>
