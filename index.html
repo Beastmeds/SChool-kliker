@@ -1,100 +1,315 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ultimate School Clicker Deluxe</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Game Hub — Ultimate School Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
-:root {--bg-main: linear-gradient(135deg,#6e00ff,#00c3ff);--text-col:white;--btn-col:#ffcc00;--btn-col-hover:#ffe066;}
-body.dark{--bg-main:linear-gradient(135deg,#000,#333);--text-col:#fff;--btn-col:#444;--btn-col-hover:#666;}
-body.light{--bg-main:linear-gradient(135deg,#fff,#d9d9d9);--text-col:#000;--btn-col:#bbb;--btn-col-hover:#ddd;}
-body.school{--bg-main:linear-gradient(135deg,#ff5500,#ffdd00);--text-col:#000;--btn-col:#00aaff;--btn-col-hover:#33ccff;}
-body{margin:0;font-family:Arial,sans-serif;background:var(--bg-main);display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;color:var(--text-col);overflow:hidden;transition:0.4s;}
-h1{font-size:40px;text-shadow:0 0 10px rgba(0,0,0,0.4);}
-#counter,#highscore,#powerupTimer,#levelBox{font-size:28px;margin:10px;}
-#clickBtn{padding:20px 40px;font-size:28px;border:none;border-radius:15px;background:var(--btn-col);cursor:pointer;transition:0.2s;}
-#clickBtn:hover{scale:1.1;background:var(--btn-col-hover);}
-.popup{position:absolute;font-size:24px;animation:float 1s ease-out forwards;pointer-events:none;}
-@keyframes float{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-80px);}}
-#themeSelector{position:absolute;top:20px;right:20px;padding:10px;background:rgba(0,0,0,0.3);border-radius:10px;color:white;}
+:root{--accent:#6e00ff;--accent2:#00c3ff;--glass:rgba(255,255,255,0.08);--glass-2:rgba(0,0,0,0.12);}*
+{box-sizing:border-box;font-family:'Poppins',Arial,sans-serif}
+body{margin:0;min-height:100vh;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center}
+.container{width:100%;max-width:1100px;padding:24px}
+.header{display:flex;align-items:center;gap:20px}
+.logo{width:72px;height:72px;border-radius:14px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px}
+.h-title{font-size:28px;margin:0}
+.card{background:var(--glass);border-radius:16px;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,0.35);backdrop-filter:blur(6px)}
+.row{display:flex;gap:16px}
+.col{flex:1}
+.center{text-align:center}
+.btn{padding:12px 18px;border-radius:12px;border:none;background:rgba(255,255,255,0.12);color:#fff;cursor:pointer;font-weight:600}
+.btn:hover{transform:translateY(-3px)}
+#gameSelection .option{display:inline-block;margin:10px}
+#startScreen img{width:220px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.45)}
+/* Game UI */
+#gameUI{display:none;flex-direction:column;align-items:center;gap:10px;padding:28px;border-radius:16px}
+#clickBtn{padding:22px 48px;border-radius:18px;border:none;background:linear-gradient(90deg,#ffd54a,#ffb300);color:#000;font-weight:800;font-size:22px}
+.small{font-size:14px;opacity:0.9}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.settingsPanel{display:none;padding:20px;border-radius:12px;margin-top:10px;background:var(--glass-2)}
+.select{padding:8px;border-radius:10px;border:none}
+/* Runner */
+#runner{display:none;position:relative;overflow:hidden;border-radius:12px;background:linear-gradient(180deg,#72c2ff,#0056b3);height:320px}
+#player{position:absolute;left:60px;bottom:40px;width:60px;height:60px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px}
+.obstacle{position:absolute;width:40px;height:40px;background:#ff4646;border-radius:8px;right:0}
+/* responsive */
+@media(max-width:700px){.header{flex-direction:column;align-items:flex-start}.logo{width:56px;height:56px}.h-title{font-size:20px}.container{padding:12px}}
 </style>
 </head>
 <body>
-<select id="themeSelector">
-<option value="default">✨ Standard</option>
-<option value="dark">🌙 Dunkel</option>
-<option value="light">🔆 Hell</option>
-<option value="school">🏫 Schul-Meme-Style</option>
-</select>
-<h1>Ultimate School Clicker Deluxe</h1>
-<div id="counter">Klicks: 0</div>
-<div id="highscore">🏆 Highscore: 0</div>
-<div id="powerupTimer"></div>
-<div id="levelBox"></div>
-<button id="clickBtn">KLICK MICH!</button>
+<div class="container">
+  <div class="header">
+    <div class="logo">USG</div>
+    <div>
+      <h1 class="h-title">Ultimate School Games — Game Hub</h1>
+      <div class="small">Spiele, passe an, speichere — direkt im Browser oder mit Login</div>
+    </div>
+  </div>
+
+  <div class="card" id="mainCard">
+    <!-- Game selection -->
+    <div id="gameSelection" class="center">
+      <h2>🎮 Wähle ein Spiel</h2>
+      <div>
+        <button class="btn option" onclick="openStart('clicker')">🏫 Ultimate School Clicker Deluxe</button>
+        <button class="btn option" onclick="openStart('runner')">🏃 School Runner (Neu)</button>
+        <button class="btn option" onclick="openStart('quiz')">🧠 Meme-Quiz (Coming Soon)</button>
+      </div>
+      <p class="small">Weitere Spiele kannst du später hinzufügen — sie erscheinen im Menü.</p>
+    </div>
+
+    <!-- Start screen -->
+    <div id="startScreen" style="display:none;" class="center">
+      <h2 id="startTitle">Spiel</h2>
+      <img id="startImage" src="https://i.imgur.com/4AiXzf8.jpeg" alt="cover" />
+      <div style="margin-top:14px">
+        <button class="btn" onclick="enterSettings()">⚙️ Einstellungen</button>
+        <button class="btn" onclick="beginGame()">▶️ Spiel Starten</button>
+        <button class="btn" onclick="backToMenu()">⬅️ Zurück</button>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="settingsMenu" class="settingsPanel card" style="display:none;">
+      <h3>⚙️ Einstellungen</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <div>
+          <label class="small">🎵 Musik</label><br>
+          <input id="volSlider" type="range" min="0" max="1" step="0.05" value="0.3" />
+        </div>
+        <div>
+          <label class="small">🎭 Skin</label><br>
+          <select id="skinSelect" class="select">
+            <option value="schueler">🧑‍🎓 Schüler</option>
+            <option value="lehrer">👨‍🏫 Lehrer</option>
+            <option value="direktor">👨‍💼 Direktor</option>
+            <option value="ninja">🥷 Ninja</option>
+          </select>
+        </div>
+        <div>
+          <label class="small">🖼️ Hintergrund-Pack</label><br>
+          <select id="bgSelect" class="select">
+            <option value="school">🏫 Schul-Memes</option>
+            <option value="funny">😂 Lustige Memes</option>
+            <option value="landscape">🌄 Landschaften</option>
+            <option value="gaming">🎮 Gaming</option>
+            <option value="custom">⭐ Eigenes Bild (upload)</option>
+          </select>
+        </div>
+        <div>
+          <label class="small">🔥 Effekte</label><br>
+          <select id="effectsSelect" class="select"><option value="on">An</option><option value="off">Aus</option></select>
+        </div>
+        <div>
+          <label class="small">📱 Vibration</label><br>
+          <select id="vibSelect" class="select"><option value="on">An</option><option value="off">Aus</option></select>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn" onclick="applySettings()">✔️ Speichern</button>
+        <button class="btn" onclick="resetSettings()">↺ Zurücksetzen</button>
+      </div>
+      <div style="margin-top:12px">
+        <label class="small">🔐 Admin Login:</label>
+        <input id="adminPw" type="password" placeholder="Passwort" style="padding:8px;border-radius:8px;border:none;margin-left:8px" />
+        <button class="btn" onclick="doAdminLogin()">Login</button>
+      </div>
+    </div>
+
+    <!-- Game UI container (Clicker) -->
+    <div id="gameUI" class="card center" style="display:none;">
+      <h2 id="gameTitle">Ultimate School Clicker Deluxe</h2>
+      <div id="statusRow" class="row" style="align-items:center;justify-content:center;gap:16px;margin-bottom:8px">
+        <div id="counter">Klicks: 0</div>
+        <div id="highscore">🏆 Highscore: 0</div>
+        <div id="levelBox">Level 1 – XP: 0</div>
+      </div>
+
+      <button id="clickBtn">KLICK MICH!</button>
+
+      <div class="controls" style="margin-top:12px">
+        <button class="btn" id="shopBtn">🛒 Shop</button>
+        <button class="btn" id="prestigeBtn">🌟 Prestige</button>
+        <button class="btn" id="bossBtn">⚔️ Boss Fight (manuell)</button>
+        <button class="btn" id="saveBtn">💾 Spiel speichern</button>
+        <button class="btn" id="logoutBtn">🔓 Logout (falls eingeloggt)</button>
+      </div>
+
+      <div id="shopPanel" style="display:none;margin-top:12px" class="card">
+        <h4>Shop</h4>
+        <div class="small">Upgrade: +1 Multiplier — Preis: 50 Klicks</div>
+        <button class="btn" onclick="buyUpgrade()">Kaufen</button>
+        <button class="btn" onclick="closeShop()">Schließen</button>
+      </div>
+    </div>
+
+    <!-- Runner game -->
+    <div id="runnerUI" class="card center" style="display:none">
+      <h2>🏃 School Runner</h2>
+      <div id="runner">
+        <div id="player">🙂</div>
+      </div>
+      <div style="margin-top:8px">
+        <button class="btn" onclick="startRunner()">▶ Start Runner</button>
+        <button class="btn" onclick="stopRunner()">⏹ Stop</button>
+        <div class="small">Tippe / klicke zum springen. Weiche Hindernissen aus!</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Audio (playlist) -->
+<audio id="bg0" src="https://cdn.pixabay.com/download/audio/2023/03/13/audio_54d393ca5f.mp3?filename=gaming-music-143081.mp3" loop></audio>
+<audio id="bg1" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_58a6b3e2c9.mp3?filename=upbeat-ambient-110362.mp3" loop></audio>
 <audio id="clickSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_6ebadc177e.mp3?filename=click-124467.mp3"></audio>
 <audio id="powerSound" src="https://cdn.pixabay.com/download/audio/2022/03/22/audio_6c7dbfad77.mp3?filename=powerup-110248.mp3"></audio>
-<audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2023/03/13/audio_54d393ca5f.mp3?filename=gaming-music-143081.mp3" loop></audio>
+
 <script>
-let count=0; let highscore=localStorage.getItem("hs")||0; let multiplier=1; let powerTimer=0;
-let level=Number(localStorage.getItem("level")||1); let xp=Number(localStorage.getItem("xp")||0);
-let currentSkin=localStorage.getItem("skin")||"schueler"; let admin=localStorage.getItem("admin")=="true";
-let loggedIn=false;
-const counter=document.getElementById("counter"); const highCounter=document.getElementById("highscore");
-const levelBox=document.getElementById("levelBox"); const timerText=document.getElementById("powerupTimer");
-const btn=document.getElementById("clickBtn"); const clickSound=document.getElementById("clickSound");
-const powerSound=document.getElementById("powerSound"); const bgMusic=document.getElementById("bgMusic"); bgMusic.volume=0.3; bgMusic.play();
-const skins={schueler:"🧑‍🎓",lehrer:"👨‍🏫",direktor:"👨‍💼"};
-const memeBackgrounds=["https://i.imgur.com/4AiXzf8.jpeg","https://i.imgur.com/b6QKOD4.jpeg","https://i.imgur.com/2yaf2wb.jpeg"];
-let memeIndex=0;
-function changeMemeBg(){document.body.style.backgroundImage=`url(${memeBackgrounds[memeIndex]})`;document.body.style.backgroundSize="cover";document.body.style.backgroundPosition="center"; memeIndex=(memeIndex+1)%memeBackgrounds.length;}
-setInterval(changeMemeBg,15000);
-const themeSelector=document.getElementById("themeSelector"); themeSelector.addEventListener("change",()=>{document.body.className=themeSelector.value;});
+// --- State & persistence ---
+const state = {
+  count: 0,
+  highscore: Number(localStorage.getItem('hs')||0),
+  multiplier: Number(localStorage.getItem('mult')||1),
+  level: Number(localStorage.getItem('level')||1),
+  xp: Number(localStorage.getItem('xp')||0),
+  skin: localStorage.getItem('skin')||'schueler',
+  bgPack: localStorage.getItem('bgPack')||'school',
+  effects: localStorage.getItem('effects')||'on',
+  vib: localStorage.getItem('vib')||'on',
+  prestige: Number(localStorage.getItem('prestige')||0),
+  loggedInUser: localStorage.getItem('user')||null
+};
 
-// Level & XP
-function addXP(amount){xp+=amount; if(xp>=level*50){xp=0; level++; alert(`🎉 Level UP! Du bist jetzt Level ${level}!`);} localStorage.setItem("level",level); localStorage.setItem("xp",xp); levelBox.textContent=`Level ${level} – XP: ${xp}`;}
-levelBox.textContent=`Level ${level} – XP: ${xp}`;
+// Elements
+const gameSelection=document.getElementById('gameSelection');
+const startScreen=document.getElementById('startScreen');
+const settingsMenu=document.getElementById('settingsMenu');
+const gameUI=document.getElementById('gameUI');
+const runnerUI=document.getElementById('runnerUI');
+const startTitle=document.getElementById('startTitle');
+const startImage=document.getElementById('startImage');
+const clickBtn=document.getElementById('clickBtn');
+const counter=document.getElementById('counter');
+const highscore=document.getElementById('highscore');
+const levelBox=document.getElementById('levelBox');
+const bg0=document.getElementById('bg0');
+const bg1=document.getElementById('bg1');
+const volSlider=document.getElementById('volSlider');
+const skinSelect=document.getElementById('skinSelect');
+const bgSelect=document.getElementById('bgSelect');
+const effectsSelect=document.getElementById('effectsSelect');
+const vibSelect=document.getElementById('vibSelect');
 
-// Klick Event & Vibration
-btn.addEventListener("click",(event)=>{
-clickSound.currentTime=0; clickSound.play(); count+=multiplier; counter.textContent="Klicks: "+count;
-if(count>highscore){highscore=count; localStorage.setItem("hs",highscore); highCounter.textContent="🏆 Highscore: "+highscore;}
-const pop=document.createElement("div"); pop.classList.add("popup"); pop.textContent="+"+multiplier; pop.style.left=event.clientX+"px"; pop.style.top=event.clientY+"px"; document.body.appendChild(pop); setTimeout(()=>pop.remove(),900);
-if(Math.random()<0.15) activatePowerup(); addXP(multiplier); if(window.navigator.vibrate){navigator.vibrate(50);}
-});
-function activatePowerup(){multiplier=5; powerTimer=5; powerSound.play(); timerText.textContent="⚡ POWER-UP: "+powerTimer+"s";
-const interval=setInterval(()=>{powerTimer--; timerText.textContent="⚡ POWER-UP: "+powerTimer+"s"; if(powerTimer<=0){clearInterval(interval); multiplier=1; timerText.textContent="";}},1000);}
+// Playlist & music
+const playlist=[bg0,bg1]; let curTrack=0; playlist[curTrack].volume=Number(volSlider.value);
+playlist.forEach(a=>{a.loop=true});
+function playMusic(){playlist[curTrack].play();}
+function stopMusic(){playlist.forEach(a=>a.pause());}
+playMusic();
 
-// Skin Button
-const skinBtn=document.createElement("button"); skinBtn.textContent="🎭 Skin wechseln"; skinBtn.style.marginTop="20px"; document.body.appendChild(skinBtn);
-skinBtn.onclick=()=>{const keys=Object.keys(skins); const next=keys[(keys.indexOf(currentSkin)+1)%keys.length]; currentSkin=next; localStorage.setItem("skin",currentSkin); document.title=`Ultimate School Clicker Deluxe ${skins[currentSkin]}`;};
-document.title=`Ultimate School Clicker Deluxe ${skins[currentSkin]}`;
+volSlider.addEventListener('input',()=>{playlist.forEach(a=>a.volume=Number(volSlider.value)); localStorage.setItem('vol',volSlider.value);});
 
-// Admin Mode
-const adminBtn=document.createElement("button"); adminBtn.textContent="👑 Admin Mode"; adminBtn.style.marginTop="10px"; adminBtn.style.padding="15px"; adminBtn.style.background="red"; adminBtn.style.color="white"; adminBtn.style.borderRadius="10px"; document.body.appendChild(adminBtn);
-adminBtn.onclick=()=>{const pw=prompt("Admin Passwort eingeben (Standard: 1234)"); if(pw=="1234"){admin=true; localStorage.setItem("admin",true); alert("Admin Mode aktiviert!"); unlockAdminTools();}};
-function unlockAdminTools(){if(!admin)return; const cheatBtn=document.createElement("button"); cheatBtn.textContent="💰 +1000 Punkte"; cheatBtn.style.marginTop="10px"; cheatBtn.style.padding="15px"; cheatBtn.style.background="gold"; cheatBtn.style.color="black"; cheatBtn.style.borderRadius="10px"; document.body.appendChild(cheatBtn); cheatBtn.onclick=()=>{count+=1000; counter.textContent="Klicks: "+count;};}
-if(admin) unlockAdminTools();
+// Menu navigation
+let activeGame=null; // 'clicker' or 'runner'
+function openStart(game){activeGame=game; gameSelection.style.display='none'; startScreen.style.display='block';
+  startTitle.textContent = game==='clicker' ? '🏫 Ultimate School Clicker Deluxe' : (game==='runner' ? '🏃 School Runner' : 'Spiel');
+  startImage.src = game==='clicker' ? 'https://i.imgur.com/2yaf2wb.jpeg' : 'https://i.imgur.com/b6QKOD4.jpeg';
+}
+function backToMenu(){startScreen.style.display='none'; gameSelection.style.display='block';}
+function beginGame(){startScreen.style.display='none'; if(activeGame==='clicker'){gameUI.style.display='flex'; runnerUI.style.display='none'; initClicker();} else if(activeGame==='runner'){runnerUI.style.display='block'; gameUI.style.display='none'; initRunner();}}
+function enterSettings(){startScreen.style.display='none'; settingsMenu.style.display='block';}
 
-// Optional Login
-const loginBtn=document.createElement("button"); loginBtn.textContent="🔑 Anmelden (optional)"; loginBtn.style.marginTop="10px"; document.body.appendChild(loginBtn);
-loginBtn.onclick=()=>{const user=prompt("GitHub Benutzername (optional)"); if(user){loggedIn=true; alert(`🎉 Eingeloggt als ${user}, Spielstand gesperrt`);} else{loggedIn=false; alert("🎮 Spiel ohne Konto läuft normal");}};
+// Apply settings
+function applySettings(){state.skin = skinSelect.value; state.bgPack = bgSelect.value; state.effects = effectsSelect.value; state.vib = vibSelect.value; localStorage.setItem('skin',state.skin); localStorage.setItem('bgPack',state.bgPack); localStorage.setItem('effects',state.effects); localStorage.setItem('vib',state.vib); alert('Einstellungen gespeichert'); updateBackgroundPack(); settingsMenu.style.display='none'; startScreen.style.display='block';}
+function resetSettings(){localStorage.clear(); alert('Einstellungen zurückgesetzt (LocalStorage gelöscht). Seite neu laden.');}
 
-// --- Boss-Fights ---
-function spawnBoss(){if(count<100) return; alert("⚔️ Boss erscheint! Klicke schnell 20x!\nDu bekommst Bonus-XP wenn du ihn besiegst."); let bossHP=20; const listener=(event)=>{bossHP--; addXP(5); if(bossHP<=0){alert("🎉 Boss besiegt! Bonus XP! "); document.removeEventListener('click',listener);}}; document.addEventListener('click',listener);}
-setInterval(spawnBoss,60000);
+// Admin
+function doAdminLogin(){const pw=document.getElementById('adminPw').value; if(pw==='1234'){localStorage.setItem('admin','true'); alert('Admin aktiviert');} else alert('Falsches Passwort');}
 
-// --- Prestige-System ---
-let prestigePoints=Number(localStorage.getItem('prestige')||0);
-function prestige(){if(level<10){alert('Level 10 nötig für Prestige!'); return;} prestigePoints++; localStorage.setItem('prestige',prestigePoints); count=0; level=1; xp=0; alert(`🌟 Prestige erreicht! Du hast jetzt ${prestigePoints} Prestige Punkte!`); updateDisplay();}
-function updateDisplay(){counter.textContent="Klicks: "+count; levelBox.textContent=`Level ${level} – XP: ${xp}`; highCounter.textContent="🏆 Highscore: "+highscore;}
+// Background packs
+const packs={
+  school:['https://i.imgur.com/4AiXzf8.jpeg','https://i.imgur.com/b6QKOD4.jpeg','https://i.imgur.com/2yaf2wb.jpeg'],
+  funny:['https://i.imgur.com/3G3wX2h.jpeg','https://i.imgur.com/eV6Y7qS.jpeg','https://i.imgur.com/9J3M6bL.jpeg'],
+  landscape:['https://i.imgur.com/WfP2Q6i.jpeg','https://i.imgur.com/0Dcnj8U.jpeg','https://i.imgur.com/8K3s9zH.jpeg'],
+  gaming:['https://i.imgur.com/x8Q1z3b.jpeg','https://i.imgur.com/1l2g5m9.jpeg','https://i.imgur.com/7uT9aK6.jpeg']
+};
+let bgIndex=0; function updateBackgroundPack(){const pack=state.bgPack; if(pack==='custom') return; document.body.style.backgroundImage = `url(${packs[pack][bgIndex]})`; document.body.style.backgroundSize='cover'; document.body.style.backgroundPosition='center'; bgIndex=(bgIndex+1)%packs[pack].length; setTimeout(updateBackgroundPack,15000);} updateBackgroundPack();
 
-// --- Shop mit Upgrades ---
-const shopBtn=document.createElement('button'); shopBtn.textContent='🛒 Shop'; shopBtn.style.marginTop='10px'; document.body.appendChild(shopBtn);
-shopBtn.onclick=()=>{let buy=prompt('Upgrade kaufen? +1 Multiplier für 50 Klicks'); if(buy && count>=50){count-=50; multiplier++; alert('Multiplier erhöht!'); updateDisplay();}}
+// --- Clicker Game logic ---
+function initClicker(){updateDisplay();}
+function updateDisplay(){counter.textContent='Klicks: '+state.count; highscore.textContent='🏆 Highscore: '+state.highscore; levelBox.textContent=`Level ${state.level} – XP: ${state.xp}`;}
 
-// --- Schul-Fächer Power-Ups ---
-const subjects=['Mathe','Deutsch','Bio','Sport']; function randomPowerUp(){if(Math.random()<0.1){const sub=subjects[Math.floor(Math.random()*subjects.length)]; multiplier+=1; alert(`🏫 PowerUp: ${sub} +1 Multiplier`);}} setInterval(randomPowerUp,30000);
+clickBtn.addEventListener('click', (e)=>{document.getElementById('clickSound').currentTime=0; document.getElementById('clickSound').play(); state.count += state.multiplier; if(state.vib==='on' && navigator.vibrate) navigator.vibrate(50); updateDisplay(); gainXP(state.multiplier); if(state.count>state.highscore){state.highscore=state.count; localStorage.setItem('hs',state.highscore);} // powerup chance
+if(Math.random()<0.12) activatePowerup();});
+
+function activatePowerup(){const old=state.multiplier; state.multiplier = old + 4; let t=5; document.getElementById('powerSound').play(); const int=setInterval(()=>{t--; if(t<=0){clearInterval(int); state.multiplier=old;}},1000);}
+
+function gainXP(amount){state.xp += amount; if(state.xp >= state.level*50){state.xp = 0; state.level++; alert('🎉 Level UP! Du bist jetzt Level '+state.level);} localStorage.setItem('level',state.level); localStorage.setItem('xp',state.xp); updateDisplay();}
+
+// Shop & Prestige
+function buyUpgrade(){if(state.count>=50){state.count-=50; state.multiplier++; localStorage.setItem('mult',state.multiplier); updateDisplay(); alert('Upgrade gekauft! Multiplier ist jetzt '+state.multiplier);} else alert('Nicht genug Klicks');}
+function closeShop(){document.getElementById('shopPanel').style.display='none';}
+
+document.getElementById('shopBtn').addEventListener('click',()=>{document.getElementById('shopPanel').style.display='block';});
+document.getElementById('prestigeBtn').addEventListener('click',()=>{if(state.level<10){alert('Level 10 nötig für Prestige'); return;} state.prestige++; localStorage.setItem('prestige',state.prestige); state.count=0; state.level=1; state.xp=0; alert('🌟 Prestige! Du hast '+state.prestige+' Prestige-Punkte'); updateDisplay();});
+
+document.getElementById('bossBtn').addEventListener('click',()=>{spawnBoss(true);});
+
+// Boss fight (manual or auto)
+function spawnBoss(manual=false){if(state.count<100 && !manual){return;} const hp = 12 + Math.floor(state.level/2); let bossHP=hp; alert('⚔️ Boss erscheint! Klicke so schnell du kannst, um ihn zu besiegen (benutze den Haupt-Button). HP='+bossHP);
+const listener = ()=>{bossHP--; gainXP(8); if(bossHP<=0){document.removeEventListener('click',listener); alert('🎉 Boss besiegt! Bonus XP erhalten!');}}
+; document.addEventListener('click',listener); if(!manual) setTimeout(()=>{document.removeEventListener('click',listener);},15000);} // auto boss could be scheduled
+
+// Save / Login
+document.getElementById('saveBtn').addEventListener('click',()=>{localStorage.setItem('save',JSON.stringify(state)); alert('Spielstand lokal gespeichert');});
+document.getElementById('logoutBtn').addEventListener('click',()=>{localStorage.removeItem('user'); state.loggedInUser=null; alert('Ausgeloggt');});
+
+// Optional simple login (GitHub username only, no OAuth in this demo)
+function simpleLogin(username){state.loggedInUser = username; localStorage.setItem('user',username); alert('Eingeloggt als '+username+' — Spielstand wird jetzt bei Konto-Sperre gesichert.');}
+
+// --- Runner Game implementation (simple) ---
+let runnerInterval=null; let obstacles=[]; const runner=document.getElementById('runner'); const player=document.getElementById('player'); let jumping=false; let playerY=40; let gravity=4; let velocity=0; function initRunner(){player.style.bottom=playerY+'px';}
+function startRunner(){if(runnerInterval) return; obstacles=[]; runner.innerHTML=''; runner.appendChild(player); player.style.left='60px'; player.style.bottom='40px'; jumping=false; velocity=0; runnerInterval=setInterval(tick,20); document.addEventListener('keydown',onJump); runner.addEventListener('click',onJump);}
+function stopRunner(){clearInterval(runnerInterval); runnerInterval=null; document.removeEventListener('keydown',onJump); runner.removeEventListener('click',onJump);}
+function onJump(e){if(e.type==='keydown' && e.key!==' ' && e.key!=='ArrowUp') return; if(!jumping){jumping=true; velocity=14;}}
+function tick(){// physics
+velocity -= 0.8; playerY += velocity; if(playerY<=40){playerY=40; jumping=false; velocity=0;} player.style.bottom = playerY+'px'; // spawn obstacles
+if(Math.random()<0.03){spawnObstacle();}
+// move obstacles
+for(let i=obstacles.length-1;i>=0;i--){const ob=obstacles[i]; ob.x -= 6; ob.el.style.right = ob.x+'px'; if(ob.x>800){} if(ob.x < -80){ob.el.remove(); obstacles.splice(i,1);} // collision
+const playerRect = player.getBoundingClientRect(); const obRect = ob.el.getBoundingClientRect(); if(!(playerRect.right < obRect.left || playerRect.left > obRect.right || playerRect.bottom < obRect.top || playerRect.top > obRect.bottom)){
+  stopRunner(); alert('💥 Du bist gegen ein Hindernis gelaufen! Score wird als Klicks gutgeschrieben'); // reward
+  state.count += 20; updateDisplay(); break; }
+}
+}
+function spawnObstacle(){const el = document.createElement('div'); el.className='obstacle'; el.style.right='-40px'; el.style.bottom='40px'; runner.appendChild(el); obstacles.push({el:el,x: -40}); }
+
+// Mobile improvements: make buttons large, add tap guidance
+// Apply initial settings to UI
+(function init(){volSlider.value = localStorage.getItem('vol') || 0.3; playlist.forEach(a=>a.volume=Number(volSlider.value)); skinSelect.value = state.skin; bgSelect.value = state.bgPack; effectsSelect.value = state.effects; vibSelect.value = state.vib; updateDisplay(); if(state.loggedInUser){alert('Hallo '+state.loggedInUser);} })();
+
+// Expose simple functions for UI buttons
+function openBackgroundMenu(){settingsMenu.style.display='none'; document.getElementById('backgroundMenu')?.remove();}
+function changeVolume(){/* handled by slider */}
+function cycleSkin(){/* handled in settings */}
+function toggleEffects(){state.effects = state.effects === 'on' ? 'off' : 'on'; localStorage.setItem('effects',state.effects); alert('Effekte: '+state.effects);} 
+function toggleVibration(){state.vib = state.vib === 'on' ? 'off' : 'on'; localStorage.setItem('vib',state.vib); alert('Vibration: '+state.vib);} 
+function adminOptions(){if(localStorage.getItem('admin')==='true') alert('Admin: Cheat +1000 verfügbar (im Spiel)'); else alert('Admin nicht aktiviert');}
+
+// Helper to open settings from main
+function enterSettingsFromMenu(){gameSelection.style.display='none'; settingsMenu.style.display='block';}
+
+// Simple upload handler (custom background)
+function uploadCustomImage(){const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=(e)=>{const file=e.target.files[0]; const url=URL.createObjectURL(file); document.body.style.backgroundImage = `url(${url})`; document.body.style.backgroundSize='cover'; document.body.style.backgroundPosition='center'; localStorage.setItem('customBg', url);}; input.click();}
+
+// expose small functions used earlier
+window.enterSettings = enterSettings; window.beginGame = beginGame; window.backToMenu = backToMenu; window.openStart = openStart; window.openBackgroundMenu = ()=>{settingsMenu.style.display='none'; document.getElementById('backgroundMenu')?.remove(); const bm = document.createElement('div'); bm.id='backgroundMenu'; bm.className='card'; bm.style.marginTop='12px'; bm.innerHTML = `<h3>Hintergrund wählen</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><button class='btn' onclick="(function(){state.bgPack='school'; localStorage.setItem('bgPack','school'); updateBackgroundPack(); alert('Schul-Pack gewählt')})()">🏫 Schul</button><button class='btn' onclick="(function(){state.bgPack='funny'; localStorage.setItem('bgPack','funny'); updateBackgroundPack(); alert('Funny-Pack gewählt')})()">😂 Funny</button><button class='btn' onclick="(function(){state.bgPack='landscape'; localStorage.setItem('bgPack','landscape'); updateBackgroundPack(); alert('Landscape gewählt')})()">🌄 Landschaft</button><button class='btn' onclick="(function(){state.bgPack='gaming'; localStorage.setItem('bgPack','gaming'); updateBackgroundPack(); alert('Gaming gewählt')})()">🎮 Gaming</button><button class='btn' onclick="(function(){uploadCustomImage()})()">⭐ Eigenes</button></div><div style='margin-top:8px'><button class='btn' onclick="document.getElementById('backgroundMenu').remove(); settingsMenu.style.display='block'">⬅ Zurück</button></div>`; settingsMenu.parentNode.appendChild(bm);} ;
+
+function updateBackgroundPack(){ // immediate update
+  const pack = state.bgPack || 'school'; if(pack === 'custom'){ const url = localStorage.getItem('customBg'); if(url) document.body.style.backgroundImage = `url(${url})`; return; } const arr = packs[pack]||packs['school']; document.body.style.backgroundImage = `url(${arr[bgIndex%arr.length]})`; document.body.style.backgroundSize='cover'; document.body.style.backgroundPosition='center'; bgIndex++; setTimeout(updateBackgroundPack,15000);
+}
+
 </script>
 </body>
 </html>
